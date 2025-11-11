@@ -3,15 +3,16 @@ import json
 from pprint import pprint
 
 
-def fetch_job_search_data(keyword: str, page: int) -> dict:
+# fetch jobs data based on searching keyword.
+def fetch_job_search_data(keyword: str) -> dict:
     
     url = "https://api01.ctgoodjobs.hk/job/api/jobs/search"
 
     payload = json.dumps({
         "pagingInputs": {
-            "page": f"{page}",
-            "pageSize": "1000",
-            "pageOneSize": "1000"
+            "page": "1",
+            "pageSize": "2000",
+            "pageOneSize": "2000"
         },
         "sort": 2,
         "keyword": f"{keyword}",
@@ -56,23 +57,26 @@ def fetch_job_search_data(keyword: str, page: int) -> dict:
     return response.json()
 
 
+# get the job info.
+def get_job_info(jobs: list[dict]) -> list[dict]:
+    
+    filtered_jobs = []
+    
+    for job in jobs:
+        dict = {
+            "jobId": job["jobId"],
+            "companyId": job["companyId"],
+            "companyName": job["companyName"],
+            "companyUrl": job["companyUrl"],
+            "jobTitle": job["jobTitle"],
+            "highlight": job["highlights"],
+            "experience": job["experience"],
+            "location": job["locations"],
+            "salary": job["salary"],
+            "jobUrl": job["url"],
+            "publishDate": job["publishTime"]["date"]
+        }
+        filtered_jobs.append(dict)
+        
+    return filtered_jobs
 
-# testing.
-keyword="government"
-results = fetch_job_search_data(keyword=keyword, page=1)
-
-print(f"total no. of jobs: {results["data"]["meta"]["jobsTotal"]}")
-
-for i, job in enumerate(results["data"]["jobs"]):
-    print(f"Job No: {i+1}")
-    print(f"CompanyId: {job["companyId"]}")
-    print(f"Company Name: {job["companyName"]}")
-    print(f"Commpany url: {job["companyUrl"]}")
-    print(f"Job Title: {job["jobTitle"]}")
-    print(f"Highlight: {job["highlights"]}")
-    print(f"Experience: {job["experience"]}")
-    print(f"Location: {job["locations"]}")
-    print(f"Salary: {job["salary"]}")
-    print(f"Job Ad URL: {job["url"]}")
-    print(f"Publish Date: {job["publishTime"]["date"]}")
-    print("\n")
